@@ -45,3 +45,7 @@ __pycache__/
 *.pyo
 *.pyd
 .pytest_cache/
+start.sh
+
+frontend/src-tauri/target/
+*.exe

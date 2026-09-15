@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
-const BACKEND_URL = 'https://notemixi.tail1a26d2.ts.net:8443';
+const BACKEND_URL = '/api';
 
 function LoginPage() {
   const [usernameInput, setUsernameInput] = useState('');

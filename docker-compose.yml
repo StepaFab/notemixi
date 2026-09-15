@@ -1,0 +1,14 @@
+services:
+  backend:
+    build: ./backend
+    container_name: notemixi-backend
+    restart: always
+    env_file:
+      - ./backend/.env
+
+  frontend:
+    build: ./frontend
+    container_name: notemixi-frontend
+    restart: always
+    ports:
+      - "127.0.0.1:80:80"

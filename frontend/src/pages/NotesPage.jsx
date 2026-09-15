@@ -12,7 +12,7 @@ import { marked } from 'marked';
 
 import Logo from '../Logo';
 
-const BACKEND_URL = 'https://notemixi.tail1a26d2.ts.net:8443';
+const BACKEND_URL = '/api';
 
 // --- STYLING OBSIDIANU UVNITŘ EDITORU ---
 const obsidianHighlight = HighlightStyle.define([

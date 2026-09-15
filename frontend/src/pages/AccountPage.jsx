@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const BACKEND_URL = 'https://notemixi.tail1a26d2.ts.net:8443';
+const BACKEND_URL = '/api';
 
 function AccountPage() {
   const navigate = useNavigate();

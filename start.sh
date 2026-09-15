@@ -1,40 +1,29 @@
 #!/bin/bash
 
-echo "🚀 Spouštím NoteMixi..."
+set -e
 
-echo "⚙️ Spouštím backend..."
-# Přejde do složky backend
-cd backend || exit
+echo "Zastavuji staré kontejnery..."
+docker compose down
 
-# Automatická aktivace Python virtuálního prostředí, pokud existuje
-if [ -d "venv" ]; then 
-    source venv/bin/activate
-elif [ -d ".venv" ]; then 
-    source .venv/bin/activate
-fi
+echo "Stavím a spouštím NoteMixi..."
+docker compose up -d --build
 
-# Spuštění Uvicornu na pozadí
-python3 -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload &
-BACKEND_PID=$!
+echo "Čekám na frontend..."
+sleep 2
 
-echo "🌍 Spouštím Tauri desktopovou aplikaci..."
-# Přejde do složky frontend, kde je Tauri
-cd ../frontend || exit
-npx tauri dev &
-TAURI_PID=$!
+echo "Kontroluji frontend..."
+curl -fsS http://127.0.0.1:80/ > /dev/null
 
-sleep 3
+echo "Nastavuji Tailscale HTTPS..."
+sudo tailscale serve --bg http://127.0.0.1:80
 
-echo "🔒 Zapínám Tailscale HTTPS tunely..."
-sudo tailscale serve --bg --https=443 localhost:5173
-sudo tailscale serve --bg --https=8443 localhost:8000
+echo
+echo "================================="
+echo "       NoteMixi je spuštěné"
+echo "================================="
+echo
 
-echo "====================================================="
-echo "✅ NoteMixi desktopová aplikace a backend běží!"
-echo "❌ Pro vypnutí obou serverů a okna stiskni CTRL+C"
-echo "====================================================="
+sudo tailscale serve status
 
-# Bezpečné vypnutí obou procesů (backendu i Tauri) při zmáčknutí CTRL+C
-trap "echo -e '\n🛑 Vypínám backend a Tauri...'; kill $BACKEND_PID $TAURI_PID; exit" SIGINT
-
-wait
+echo
+docker compose ps
