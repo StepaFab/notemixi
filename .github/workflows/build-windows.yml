@@ -10,6 +10,9 @@ jobs:
   build-windows:
     runs-on: windows-latest
 
+    env:
+      VITE_API_URL: https://notemixi.tail1a26d2.ts.net/api
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
