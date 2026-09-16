@@ -13,6 +13,8 @@
     "@codemirror/lang-markdown": "^6.5.2",
     "@lezer/markdown": "^1.7.2",
     "@uiw/react-codemirror": "^4.25.11",
+    "html2pdf.js": "^0.14.0",
+    "marked": "^18.0.13",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-markdown": "^10.1.0",
