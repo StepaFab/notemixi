@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "NoteMixi",
-  "version": "0.1.0",
-  "identifier": "cz.notemixi.app",
+  "version": "0.1.1",
+  "identifier": "cz.notemixi.desktop",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
