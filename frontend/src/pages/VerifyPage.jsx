@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-const BACKEND_URL = '/api';
+const BACKEND_URL =
+  import.meta.env.VITE_API_URL || '/api';
 
 // Zde přijímáme funkce pro nastavení stavu aplikace z App.jsx
 function VerifyPage({ setToken, setUsername }) {

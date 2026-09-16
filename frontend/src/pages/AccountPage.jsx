@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const BACKEND_URL = '/api';
+const BACKEND_URL =
+  import.meta.env.VITE_API_URL || '/api';
 
 function AccountPage() {
   const navigate = useNavigate();

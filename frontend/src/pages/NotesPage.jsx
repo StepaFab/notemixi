@@ -12,7 +12,8 @@ import { marked } from 'marked';
 
 import Logo from '../Logo';
 
-const BACKEND_URL = '/api';
+const BACKEND_URL =
+  import.meta.env.VITE_API_URL || '/api';
 
 // --- STYLING OBSIDIANU UVNITŘ EDITORU ---
 const obsidianHighlight = HighlightStyle.define([
