@@ -60,17 +60,13 @@ jobs:
         uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPLE_SIGNING_IDENTITY: "-"
         with:
           projectPath: frontend
           tagName: v__VERSION__
           releaseName: "NoteMixi v__VERSION__"
           releaseBody: |
             NoteMixi desktop release.
-
-            Downloads:
-            - Windows installer
-            - macOS Apple Silicon installer
-            - macOS Intel installer
           releaseDraft: false
           prerelease: false
           generateReleaseNotes: true
