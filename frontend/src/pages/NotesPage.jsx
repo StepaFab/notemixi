@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import CodeMirror from '@uiw/react-codemirror';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
@@ -67,6 +67,9 @@ function NotesPage() {
   
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [avatar, setAvatar] = useState(null);
+  const [userEmail, setUserEmail] = useState('');
+  const menuRef = useRef(null);
+  const menuButtonRef = useRef(null);
 
   // --- STAVY PRO HROMADNÝ EXPORT ---
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -105,6 +108,7 @@ function NotesPage() {
         if (res.ok) {
           const data = await res.json();
           setAvatar(data.avatar);
+          setUserEmail(data.email || '');
         }
       } catch (err) {
         console.error("Chyba při načítání profilu:", err);
@@ -112,6 +116,25 @@ function NotesPage() {
     };
     if (token) fetchUserProfile();
   }, [token]);
+
+  useEffect(() => {
+    if (!isDropdownOpen) return undefined;
+    const closeOnOutside = (event) => {
+      if (!menuRef.current?.contains(event.target)) setIsDropdownOpen(false);
+    };
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') {
+        setIsDropdownOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+    document.addEventListener('pointerdown', closeOnOutside);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutside);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [isDropdownOpen]);
 
   useEffect(() => {
     globalLinkClickHandler = async (linkedTitle) => {
@@ -192,6 +215,7 @@ function NotesPage() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('username');
     setActiveNote(null);
     setNotes([]);
     navigate('/login', { replace: true }); 
@@ -371,9 +395,21 @@ function NotesPage() {
         <div className="top-editor-navbar">
           <div></div> 
           
-          <div className="nav-right" style={{ position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+          <div className="nav-right account-menu-anchor" ref={menuRef} onClick={(e) => e.stopPropagation()}>
             <button 
+              ref={menuButtonRef}
               className="account-dropdown-btn"
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded={isDropdownOpen}
+              aria-label={`Uživatelské menu${username ? `: ${username}` : ''}`}
+              onKeyDown={(event) => {
+                if (event.key === 'ArrowDown') {
+                  event.preventDefault();
+                  setIsDropdownOpen(true);
+                  requestAnimationFrame(() => menuRef.current?.querySelector('[role="menuitem"]')?.focus());
+                }
+              }}
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
               {avatar ? (
@@ -381,16 +417,28 @@ function NotesPage() {
               ) : (
                 <span>👤</span>
               )}
-              {username || 'Account'} ▼
+              <span className="account-trigger-name">{username || 'Účet'}</span>
+              <span className={`account-trigger-chevron ${isDropdownOpen ? 'is-open' : ''}`} aria-hidden="true">⌄</span>
             </button>
             
             {isDropdownOpen && (
-              <div className="account-dropdown-menu">
-                <button onClick={() => navigate('/account')} className="dropdown-item">⚙️ Nastavení účtu</button>
-                <div className="dropdown-divider"></div>
-                <button onClick={handleLogout} className="dropdown-item">🚪 Odhlásit se</button>
-                <div className="dropdown-divider"></div>
-                <button onClick={handleDeleteAccount} className="dropdown-item danger">❌ Smazat účet</button>
+              <div className="account-dropdown-menu" role="menu" aria-label="Uživatelské menu" onKeyDown={(event) => {
+                if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+                const items = [...menuRef.current.querySelectorAll('[role="menuitem"]')];
+                const current = items.indexOf(document.activeElement);
+                const next = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1 : (current + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+                event.preventDefault();
+                items[next]?.focus();
+              }}>
+                <div className="account-menu-profile">
+                  {avatar ? <img src={avatar} alt="" className="account-menu-avatar" /> : <span className="account-menu-avatar account-menu-avatar-fallback">{username?.slice(0, 1).toUpperCase() || 'N'}</span>}
+                  <span className="account-menu-identity"><strong>{username || 'NoteMixi účet'}</strong><small>{userEmail || 'Přihlášený účet'}</small></span>
+                </div>
+                <div className="dropdown-divider" role="separator"></div>
+                <button onClick={() => { setIsDropdownOpen(false); navigate('/account'); }} className="dropdown-item" role="menuitem"><span className="menu-item-icon" aria-hidden="true">⚙</span>Nastavení účtu</button>
+                <button onClick={handleLogout} className="dropdown-item" role="menuitem"><span className="menu-item-icon" aria-hidden="true">↪</span>Odhlásit se</button>
+                <div className="dropdown-divider" role="separator"></div>
+                <button onClick={handleDeleteAccount} className="dropdown-item danger" role="menuitem"><span className="menu-item-icon" aria-hidden="true">×</span>Smazat účet</button>
               </div>
             )}
           </div>
